@@ -38,11 +38,18 @@
     <div class="media-tab">
       <ul class="media-items media-images" id="media-images">
         <li ng-repeat="slideshow in slideshowsCtrl.assignedSlideshows track by slideshow.id"
-          class="media-image"
           ng-click="$parent.slideshowsEditorCtrl.openSlideshowsEditor('edit', slideshow.id)"
+          sf-draggable="!slideshowsCtrl.inArticleBody(slidehow.id)"
+          class="media-image draggable"
+          data-draggable-type="slideshow"
+          data-id="{{slideshow.id}}"
           >
+          <div class="drag-bar"></div>
           <div class="detach" title="{{ ::('aes.label.remove'|trans) }}">
             <span class="glyphicon glyphicon-remove" ng-click="slideshowsCtrl.confirmUnassignSlideshow(slideshow); $event.stopPropagation()"></span>
+          </div>
+          <div ng-if="slideshowsCtrl.inArticleBody(slideshow.id)" class="attached">
+            <span class="glyphicon glyphicon-ok"></span>
           </div>
           <figure>
             <img ng-if="slideshow.type == 'image' && slideshow.cover" width="100%" height="100%" ng-src="{{slideshow.cover}}">

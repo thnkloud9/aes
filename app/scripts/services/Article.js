@@ -129,6 +129,54 @@ angular.module('authoringEnvironmentApp').factory('Article', [
         }
 
         /**
+        * Finds slideshow placeholders in text and converts them to
+        * slidehow HTML (this can be later converted to Aloha blocks).
+        *
+        * An example of such placeholder:
+        *     <-- Slideshow 1234 -->
+        *
+        * @function slideshowCommentsToDivs
+        * @param text {String} text to convert
+        * @return {String} converted text
+        */
+        function slideshowCommentsToDivs(text) {
+            // the extra backslash (\) is because of Javascript being picky
+            var slideshowRex  = '<--';     // exact match
+            slideshowRex     += '\\s';      // single whitespace
+            slideshowRex     += 'Slideshow';  // exact match
+            slideshowRex     += '\\s';      // single whitespace
+            slideshowRex     += '([\\d]+)'; // capture group 1, 1+ digits
+            slideshowRex     += '(';               // capture group 2
+            slideshowRex     +=     '(';           // capture group 3
+            slideshowRex     +=         '[\\s]+';  // at least 1 whitespace
+            slideshowRex     +=         '(align';  // alternating capture group
+            slideshowRex     +=         '|\\w+)';  // or any other word
+            slideshowRex     +=         '\\s*';    // optional whitespace
+            slideshowRex     +=         '=';       // exact match
+            slideshowRex     +=         '\\s*';    // optional whitespace
+            slideshowRex     +=         '(';          // capture group 4
+            slideshowRex     +=             '"[^"]*"';  // anything except "
+            slideshowRex     +=             '|[^\\s]*'; // all but whitesp.
+            slideshowRex     +=         ')';         // end capture group 4
+            slideshowRex     +=     ')*';    // end capture group 3 (0 or more)
+            slideshowRex     += ')';       // end capture group 2
+            slideshowRex     += '[\\s]*';  // optional whitespace
+            slideshowRex     += '-->';      // exact match
+            var slideshowPattern = new RegExp(slideshowRex, 'ig');
+
+            var converted = text.replace(
+                slideshowPattern,
+                function(whole, id) {
+                var output = '<div ' +
+                    'class="slideshow aloha-slideshow-block" data-id="';
+                output += parseInt(id);
+                output += '"></div>';
+                return output;
+            });
+            return converted;
+        }
+
+        /**
         * Converts images' and snippets' HTML in article text (Aloha blocks) to
         * special placeholders, allowing to later convert those placeholders
         * back to original content.
@@ -146,10 +194,10 @@ angular.module('authoringEnvironmentApp').factory('Article', [
                 return text;
             }
 
-            sep = {snippet: '--', image: '**'};
+            sep = {snippet: '--', image: '**', slideshow: '--'};
             content = $('<div/>').html(text);
 
-            ['image', 'snippet'].forEach(function (type) {
+            ['image', 'snippet', 'slideshow'].forEach(function (type) {
                 matches = content.contents().filter('div.' + type);
 
                 // replace each matching div with its serialized version
@@ -163,8 +211,8 @@ angular.module('authoringEnvironmentApp').factory('Article', [
                         type.charAt(0).toUpperCase(), type.slice(1), ' '
                     ];
 
-                    dataItemName = (type === 'snippet') ?
-                                    'id' : 'articleimageid';
+                    dataItemName = (type === 'image') ?
+                                    'articleimageid': 'id';
                     serialized.push(parseInt($match.data(dataItemName)));
 
                     $.each($match.data(), function (name, value) {
@@ -193,7 +241,11 @@ angular.module('authoringEnvironmentApp').factory('Article', [
         * @return {String} converted text
         */
         function deserializeAlohaBlocks(text) {
-            return imageCommentsToDivs(snippetCommentsToDivs(text));
+            return imageCommentsToDivs(
+                snippetCommentsToDivs(
+                    slideshowCommentsToDivs(text)
+                )
+            );
         }
 
         /**

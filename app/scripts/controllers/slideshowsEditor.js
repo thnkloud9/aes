@@ -37,7 +37,7 @@
 
                 break;
             default:
-                url = "";
+                url = '';
         }
 
         self.url = $sce.trustAsResourceUrl(url);
@@ -64,8 +64,9 @@
     angular.module('authoringEnvironmentApp').controller(
         'SlideshowsEditorCtrl', [
         '$modal',
+        'slideshows',
         'article',
-        function ($modal, articleService) {
+        function ($modal, slideshows, articleService) {
             var article = articleService.articleInstance,
                 self = this;
 
@@ -90,6 +91,20 @@
                         }
                     }
                 });
+            };
+
+            /**
+            * Determines whether a particular slideshow 
+            * can be detached from the article. Slideshows can be 
+            * detached if they are not used in the article
+            * body.
+            *
+            * @method detachingAllowed
+            * @param slideshowId {Number} ID of the image to check
+            * @return {Boolean}
+            */
+            self.detachingAllowed = function (slideshowId) {
+                return !slideshows.inArticleBody[slideshowId];
             };
         }
     ]);

@@ -37,6 +37,32 @@ angular.module('authoringEnvironmentApp').factory('Slideshow', [
         };
 
         /**
+        * Retrieves a specific slideshow from the server.
+        *
+        * @method getById
+        * @param slideshowId {Number} ID of the slideshow to retrieve
+        * @return {Object} promise object which is resolved with retrieved
+        *   Slideshow instance on success and rejected with server error
+        *   message on failure
+        */
+        Slideshow.getById = function (slideshowId) {
+            var deferredGet = $q.defer(),
+                url = Routing.generate(
+                    'newscoop_gimme_slideshows_getslideshowitems',
+                    {id: slideshowId}, true
+                );
+
+            $http.get(url)
+            .success(function (response) {
+                deferredGet.resolve(Slideshow.createFromApiData(response));
+            }).error(function (responseBody) {
+                deferredGet.reject(responseBody);
+            });
+
+            return deferredGet.promise;
+        };
+
+        /**
         * Retrieves a list of all slideshows assigned to a specific article.
         *
         * Initially, an empty array is returned, which is later filled with

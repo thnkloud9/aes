@@ -85,8 +85,7 @@ angular.module('authoringEnvironmentApp').controller('PaneSnippetsCtrl', [
                         'aes.msgs.snippets.add.error'
                     )
                 });
-                $q.reject
-            })
+            }, $q.reject)
             .then(function () {
                 // hide form on successful add and clear its field
                 $scope.showAddSnippet = false;

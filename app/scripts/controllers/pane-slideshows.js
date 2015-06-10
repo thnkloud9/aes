@@ -10,6 +10,7 @@ angular.module('authoringEnvironmentApp').controller('PaneSlideshowsCtrl', [
     'article',
     'modalFactory',
     'Slideshow',
+    'slideshows',
     'toaster',
     '$scope',
     'TranslationService',
@@ -18,6 +19,7 @@ angular.module('authoringEnvironmentApp').controller('PaneSlideshowsCtrl', [
         articleService,
         modalFactory,
         Slideshow,
+        slideshows,
         toaster,
         $scope,
         TranslationService) {
@@ -28,6 +30,18 @@ angular.module('authoringEnvironmentApp').controller('PaneSlideshowsCtrl', [
         self.assignedSlideshows = Slideshow.getAllByArticle(
             article.articleId, article.language
         );
+
+        /**
+        * Determines whether a particular slideshow is currently included in
+        * article body or not.
+        *
+        * @method inArticleBody
+        * @param slideshowId {Number} ID of the slideshow to check
+        * @return {Boolean}
+        */
+        self.inArticleBody = function (slideshowId) {
+            return !!slideshows.inArticleBody[slideshowId];
+        };
 
         $scope.$on('close-slideshow-modal', function(event) {
             self.assignedSlideshows = Slideshow.getAllByArticle(
@@ -77,5 +91,11 @@ angular.module('authoringEnvironmentApp').controller('PaneSlideshowsCtrl', [
                     });
             }, $q.reject);
         };
+
+        $scope.$watchCollection(slideshows.attached, function () {
+            self.assignedSlideshows = Slideshow.getAllByArticle(
+                article.articleId, article.language
+            );
+        });
     }
 ]);

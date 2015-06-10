@@ -23,7 +23,7 @@ describe('Service: Dragdata', function () {
     }));
 
     it('should have a list of available types', function () {
-        expect(Dragdata.available()).toEqual(['test', 'image', 'embed']);
+        expect(Dragdata.available()).toEqual(['test', 'image', 'slideshow', 'embed']);
     });
 
     describe('converters', function () {

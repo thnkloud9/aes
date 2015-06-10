@@ -13,6 +13,9 @@ angular.module('authoringEnvironmentApp').service('Dragdata', [
                     width: $e.attr('data-width')
                 };
             },
+            'slideshow': function ($e) {
+                return { id: $e.attr('data-id'), };
+            },
             'embed': function ($e) {
                 return { id: $e.attr('data-id') };
             }
@@ -53,6 +56,17 @@ angular.module('authoringEnvironmentApp').service('Dragdata', [
                 .data({'id': data.id})
                 .data({'articleimageid': data.articleImageId})
                 .alohaBlock({'aloha-block-type': 'ImageBlock'});
+            case 'slideshow':
+                return Aloha.jQuery('<div>')
+                .addClass('slideshow')
+                .addClass('aloha-slideshow-block')
+                .data({'id': data.id})
+                .append(
+                    $('<dropped-slideshow>').attr(
+                        {'data-slideshow-id': data.id}
+                    )
+                )
+                .alohaBlock({'aloha-block-type': 'SlideshowBlock'});
             case 'embed':
                 return Aloha.jQuery('<div>')
                 .addClass('snippet')
